@@ -201,7 +201,9 @@ void setup() {
 	#ifdef OLED
 		Serial.println(F("Starting up the display"));
 		u8g2.begin();
-		displayLevel(100);
+		//displayLevel(100);
+		//Level animation display on OLED
+		intDisplayLevel();
 	#endif
 
 	Serial.println(F("Startup complete; entering main loop"));
