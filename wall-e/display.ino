@@ -19,13 +19,53 @@
  * 
  * @param  batlevel The current battery percentage
  */
-void displayLevel(int batlevel) {
 
+void intDisplayLevel (void){
+	u8g2.clearBuffer();
+	displayLevel(55);
+	solarSound01();
+	delay(1000);
+	displayLevel(60);
+	solarSound01();
+	delay(800);
+	displayLevel(65);
+	solarSound01();
+	delay(800);
+	displayLevel(70);
+	solarSound02();
+	delay(600);
+	displayLevel(75);
+	solarSound02();
+	delay(600);
+	displayLevel(80);
+	solarSound02();
+	delay(600);
+	displayLevel(85);
+	solarSound02();
+	delay(400);
+	displayLevel(90);
+	solarSound02();
+	delay(400);
+	displayLevel(95);
+	solarSound02();
+	delay(400);
+	displayLevel(100);
+	solarSound03();
+	delay(1000);
+}
+
+void displayLevel(int batlevel) {
+	u8g2.clearBuffer();
 	u8g2.firstPage();
 	do {
 		u8g2.setDrawColor(1);
-		drawSun();
-
+		/**Text Title*/
+		//u8g2.setFont(u8g2_font_squeezed_r7_tr);
+		//u8g2.setFontDirection(3);
+		//u8g2.drawStr(7,63,"SOLAR CHARGE LEVEL");
+		//drawSun();
+    sun_animation();
+		
 		// Scale to 50% as the battery should not drop bellow that anyway
 		drawBatt10();
 		if (batlevel > 55) drawBatt20();
@@ -38,7 +78,7 @@ void displayLevel(int batlevel) {
 		if (batlevel > 90) drawBatt90();
 		if (batlevel > 95) drawBatt100();
 	} while ( u8g2.nextPage() );
- 
+	u8g2.sendBuffer();
 }
 
 
@@ -46,63 +86,68 @@ void displayLevel(int batlevel) {
  * Functions to draw each of the battery level bars
  */
 void drawBatt10() {
-	u8g2.drawBox(108,0,16,40);
+	u8g2.drawBox(114, 0, 12, 38);
 }
 
 void drawBatt20() {
-	u8g2.drawBox(96,0,7,40);
+	u8g2.drawBox(103, 0, 7, 34);
 }
 
 void drawBatt30() {
-	u8g2.drawBox(84,0,7,40);
+	u8g2.drawBox(92, 0, 7, 34);
 }
 
 void drawBatt40() {
-	u8g2.drawBox(72,0,7,40);
+	u8g2.drawBox(81, 0, 7, 34);
 }
 
 void drawBatt50() {
-	u8g2.drawBox(60,0,7,40);
+	u8g2.drawBox(70, 0, 7, 34);
 }
 
 void drawBatt60() {
-	u8g2.drawBox(48,0,7,40);
+	u8g2.drawBox(59, 0, 7, 30);
 }
 
 void drawBatt70() {
-	u8g2.drawBox(36,0,7,40);
+	u8g2.drawBox(48, 0, 7, 30);
 }
 
 void drawBatt80() {
-	u8g2.drawBox(24,0,7,40);
+	u8g2.drawBox(37, 0, 7, 30);
 }
 
 void drawBatt90() {
-	u8g2.drawBox(12,0,7,40);
+	u8g2.drawBox(26, 0, 7, 30);
 }
 
 void drawBatt100() {
-	u8g2.drawBox(0,0,7,40);
+	u8g2.drawBox(15, 0, 7, 30);
 }
-
 
 /**
  * Draw the sun icon on the display
  */
 void drawSun() {
-	u8g2.drawDisc(20, 55, 3);
-	u8g2.drawLine(20,50,20,46);
-	u8g2.drawLine(20,60,20,64);
-	u8g2.drawLine(15,55,11,55);
-	u8g2.drawLine(25,55,29,55);
-	u8g2.drawLine(22,54,25,47);
-	u8g2.drawLine(25,53,29,50);   
-	u8g2.drawLine(16,53,12,50);
-	u8g2.drawLine(18,51,16,47);
-	u8g2.drawLine(16,58,12,60);
-	u8g2.drawLine(18,60,16,63);
-	u8g2.drawLine(25,58,29,60);
-	u8g2.drawLine(22,60,25,63);
+	/** New Sun Draw */
+	u8g2.drawCircle(25, 52, 5, U8G2_DRAW_ALL);
+	u8g2.drawDisc(25, 52, 3, U8G2_DRAW_ALL);
+	u8g2.drawLine(25, 45, 25, 41);
+	u8g2.drawLine(25, 59, 25, 63);
+	u8g2.drawLine(18, 52, 14, 52);
+	u8g2.drawLine(32, 52, 36, 52);
+	// ------------------------------
+	u8g2.drawLine(28, 46, 31, 42);
+	u8g2.drawLine(31, 49, 35, 46);
+	// ------------------------------
+	u8g2.drawLine(29, 58, 31, 62);
+	u8g2.drawLine(31, 55, 35, 58);
+	// ------------------------------
+	u8g2.drawLine(21, 58, 19, 62);
+	u8g2.drawLine(19, 55, 15, 58);
+	// ------------------------------
+	u8g2.drawLine(22, 46, 19, 42);
+	u8g2.drawLine(19, 49, 15, 46);
 }
 
 #endif /* OLED */
