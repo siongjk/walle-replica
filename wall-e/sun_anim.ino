@@ -1,5 +1,3 @@
-//#include <L33T_Animation.h> 
-
 #define sun_width 30
 #define sun_height 30
 //72
@@ -32,19 +30,7 @@ static  unsigned char solar_bits[] = {
   0x42, 0x08, 0x46, 0x0C, 0x38, 0x00,  
 };
 
-//                  ICON WIDTH    ICON HEIGHT    FRAME_DELAY Ms     XINCREMENT   YINCREMENT   XSTART  XEND   YSTART   YEND       FRAMES
-//L33T_Animation SUN(icWidth,        icHeight,            200,            0,             0,        25,    25,   36,      36,       frames);
-
 void sun_animation(){
     u8g2.drawXBM( 25, 33, sun_width, sun_height, sun_bits); //The sun image
-    //u8g2.drawXBM(SUN.getXpos(), SUN.getYpos(), SUN.getWidth(), SUN.getHeight(), sun_B_bits[SUN.getCurrentFrame()]); 
     u8g2.drawXBM( 1, 0, solar_width, solar_height, solar_bits); //wording in BMP
-    //SUN.chkAnimation(false);
-    //u8g2.clearBuffer(); 
-    //u8g2.drawXBM(SUN.getXpos(), SUN.getYpos(), SUN.getWidth(), SUN.getHeight(), icon[SUN.getCurrentFrame()]); 
-    //u8g2.sendBuffer();
-    //if (SUN.toReset())
-   //{
-    //SUN.resetAni();
-   //}
 }
