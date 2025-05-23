@@ -29,13 +29,13 @@
 
 /// Define pin-mapping
 // -- -- -- -- -- -- -- -- -- -- -- -- -- --
-#define DIRECTION_L_PIN 12           // Motor direction pins
+#define DIRECTION_L_PIN 12  // Motor direction pins
 #define DIRECTION_R_PIN 13
-#define PWM_SPEED_L_PIN  3           // Motor PWM pins
+#define PWM_SPEED_L_PIN 3  // Motor PWM pins
 #define PWM_SPEED_R_PIN 11
-#define BRAKE_L_PIN  9               // Motor brake pins
-#define BRAKE_R_PIN  8
-#define SERVO_ENABLE_PIN 10          // Servo shield output enable pin
+#define BRAKE_L_PIN 9  // Motor brake pins
+#define BRAKE_R_PIN 8
+#define SERVO_ENABLE_PIN 10  // Servo shield output enable pin
 
 
 /**
@@ -51,15 +51,15 @@
  *
  * To enable battery level detection, uncomment the next line:
  */
-//#define BAT_L
+#define BAT_L
 #ifdef BAT_L
-	#define BATTERY_LEVEL_PIN A2
-	#define BATTERY_MAX_VOLTAGE 12.6
-	#define BATTERY_MIN_VOLTAGE 10.2
-	#define DIVIDER_SCALING_FACTOR 0.3197
+#define BATTERY_LEVEL_PIN A2
+#define BATTERY_MAX_VOLTAGE 12.4
+#define BATTERY_MIN_VOLTAGE 10.0
+#define DIVIDER_SCALING_FACTOR 0.3197
 
 
-	/**
+/**
 	 * OLED Battery Level Display
 	 *
 	 * Displays the battery level on an oLed display. Supports a 1.3 inch oLed display using I2C.
@@ -71,24 +71,24 @@
 	 *
 	 * To enable the oLED display, uncomment the next line:
 	 */
-	//#define OLED
-	#ifdef OLED
-	  
-	  #include <U8g2lib.h>
-	  U8G2_SH1106_128X64_NONAME_1_HW_I2C u8g2(U8G2_R0, 10);
+#define OLED
+#ifdef OLED
 
-	#endif /* OLED */
+#include <U8g2lib.h>
+U8G2_SH1106_128X64_NONAME_1_HW_I2C u8g2(U8G2_R0, 10);
+
+#endif /* OLED */
 #endif /* BAT_L */
 
 
 /// Define other constants
 // -- -- -- -- -- -- -- -- -- -- -- -- -- --
-#define NUMBER_OF_SERVOS 7        // Number of servo motors
-#define SERVO_UPDATE_TIME 10      // Time in milliseconds of how often to update servo and motor positions
-#define SERVO_OFF_TIME 6000       // Turn servo motors off after 6 seconds
-#define STATUS_CHECK_TIME 10000   // Time in milliseconds of how often to check robot status (eg. battery level)
-#define CONTROLLER_THRESHOLD 1    // The minimum error which the dynamics controller tries to achieve
-#define MAX_SERIAL_LENGTH 5       // Maximum number of characters that can be received
+#define NUMBER_OF_SERVOS 7       // Number of servo motors
+#define SERVO_UPDATE_TIME 10     // Time in milliseconds of how often to update servo and motor positions
+#define SERVO_OFF_TIME 6000      // Turn servo motors off after 6 seconds
+#define STATUS_CHECK_TIME 10000  // Time in milliseconds of how often to check robot status (eg. battery level)
+#define CONTROLLER_THRESHOLD 1   // The minimum error which the dynamics controller tries to achieve
+#define MAX_SERIAL_LENGTH 5      // Maximum number of characters that can be received
 
 
 
@@ -105,12 +105,12 @@ MotorController motorR(DIRECTION_R_PIN, PWM_SPEED_R_PIN, BRAKE_R_PIN, false);
 // so that the compiler knows how much dynamic memory will be used
 struct animation_t {
 	uint16_t timer;
-	int8_t servos[NUMBER_OF_SERVOS]; 
+	int8_t servos[NUMBER_OF_SERVOS];
 };
 
 #define QUEUE_LENGTH 40
 animation_t buffer[QUEUE_LENGTH];
-Queue <animation_t> queue(QUEUE_LENGTH, buffer);
+Queue<animation_t> queue(QUEUE_LENGTH, buffer);
 
 
 /// Motor Control Variables
@@ -135,19 +135,20 @@ bool autoMode = false;
 // Serial Parsing
 // -- -- -- -- -- -- -- -- -- -- -- -- -- --
 char firstChar;
+int number;
 char serialBuffer[MAX_SERIAL_LENGTH];
 uint8_t serialLength = 0;
 
 
 // ****** SERVO MOTOR CALIBRATION *********************
 // Servo Positions:  Low,High
-int preset[][2] =  {{410,120},  // head rotation
-                    {532,178},  // neck top
-                    {120,310},  // neck bottom
-                    {465,271},  // eye right
-                    {278,479},  // eye left
-                    {340,135},  // arm left
-                    {150,360}}; // arm right
+int preset[][2] = { { 410, 120 },    // head rotation
+	                  { 532, 178 },    // neck top
+	                  { 120, 310 },    // neck bottom
+	                  { 465, 271 },    // eye right
+	                  { 278, 479 },    // eye left
+	                  { 340, 135 },    // arm left
+	                  { 150, 360 } };  // arm right
 // *****************************************************
 
 
@@ -155,11 +156,11 @@ int preset[][2] =  {{410,120},  // head rotation
 // -- -- -- -- -- -- -- -- -- -- -- -- -- --
 // Servo Pins:	     0,   1,   2,   3,   4,   5,   6,   -,   -
 // Joint Name:	  head,necT,necB,eyeR,eyeL,armL,armR,motL,motR
-float curpos[] = { 248, 560, 140, 475, 270, 250, 290, 180, 180};  // Current position (units)
-float setpos[] = { 248, 560, 140, 475, 270, 250, 290,   0,   0};  // Required position (units)
-float curvel[] = {   0,   0,   0,   0,   0,   0,   0,   0,   0};  // Current velocity (units/sec)
-float maxvel[] = { 500, 400, 500,2400,2400, 600, 600, 255, 255};  // Max Servo velocity (units/sec)
-float accell[] = { 350, 300, 480,1800,1800, 500, 500, 800, 800};  // Servo acceleration (units/sec^2)
+float curpos[] = { 248, 560, 140, 475, 270, 250, 290, 180, 180 };    // Current position (units)
+float setpos[] = { 248, 560, 140, 475, 270, 250, 290, 0, 0 };        // Required position (units)
+float curvel[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };                      // Current velocity (units/sec)
+float maxvel[] = { 500, 400, 500, 2400, 2400, 600, 600, 255, 255 };  // Max Servo velocity (units/sec)
+float accell[] = { 350, 300, 480, 1800, 1800, 500, 500, 800, 800 };  // Servo acceleration (units/sec^2)
 
 
 
@@ -184,27 +185,36 @@ void setup() {
 
 	// Initialize serial communication for debugging
 	Serial.begin(115200);
+	Serial3.begin(115200);
 	Serial.println(F("--- Wall-E Control Sketch ---"));
+	Serial3.println(F("--- Wall-E Control Sketch ---"));
 
 	randomSeed(analogRead(0));
 
 	// Check if servo animation queue is working, and move servos to known starting positions
 	if (queue.errors()) Serial.println(F("Error: Unable to allocate memory for servo animation queue"));
-	
+
 	// Soft start the servo motors
 	Serial.println(F("Starting up the servo motors"));
+	Serial3.println(F("Starting up the servo motors"));
 	digitalWrite(SERVO_ENABLE_PIN, LOW);
 	playAnimation(0);
 	softStart(queue.pop(), 3500);
 
-	// If an oLED is present, start it up
-	#ifdef OLED
-		Serial.println(F("Starting up the display"));
-		u8g2.begin();
-		displayLevel(100);
-	#endif
+// If an oLED is present, start it up
+#ifdef OLED
+	Serial.println(F("Starting up the display"));
+	u8g2.begin();
+	//displayLevel(100);
+	intDisplayLevel();
+#endif
+	//Sound Setup
+	soundSetup();
+	//OpenSmart controller setup
+	//receiversetup();
 
 	Serial.println(F("Startup complete; entering main loop"));
+	Serial3.println(F("Startup complete; entering main loop"));
 }
 
 
@@ -228,11 +238,11 @@ void readSerial() {
 		serialBuffer[0] = 0;
 		serialLength = 0;
 
-	// Otherwise add to the character to the buffer
+		// Otherwise add to the character to the buffer
 	} else {
 		if (serialLength == 0) firstChar = inchar;
 		else {
-			serialBuffer[serialLength-1] = inchar;
+			serialBuffer[serialLength - 1] = inchar;
 			serialBuffer[serialLength] = 0;
 		}
 		serialLength++;
@@ -256,19 +266,29 @@ void readSerial() {
 // -------------------------------------------------------------------
 
 void evaluateSerial() {
-
 	// Evaluate integer number in the serial buffer
 	int number = atoi(serialBuffer);
+	Serial.print(F("serialBuffer:"));
+	Serial.println((String)serialBuffer);
+	Serial3.print(F("serialBuffer:"));
+	Serial3.println((String)serialBuffer);
+	
+	if (serialBuffer < 0) {
+		int number = atoi(number);
+	}
 
-	Serial.print(firstChar); Serial.println(number);
+	Serial.print(firstChar);
+	Serial.println(number);
+	Serial3.print(firstChar);
+	Serial3.println(number);
 
 
 	// Motor Inputs and Offsets
 	// -- -- -- -- -- -- -- -- -- -- -- -- -- --
-	if      (firstChar == 'X' && number >= -100 && number <= 100) turnValue = int(number * 2.55);       // Left/right control
-	else if (firstChar == 'Y' && number >= -100 && number <= 100) moveValue = int(number * 2.55);       // Forward/reverse control
-	else if (firstChar == 'S' && number >= -100 && number <= 100) turnOffset = number;                  // Steering offset
-	else if (firstChar == 'O' && number >=    0 && number <= 250) motorDeadzone = int(number);          // Motor deadzone offset
+	if (firstChar == 'X' && number >= -100 && number <= 100) turnValue = int(number * 2.55);       // Left/right control
+	else if (firstChar == 'Y' && number >= -100 && number <= 100) moveValue = int(number * 2.55);  // Forward/reverse control
+	else if (firstChar == 'S' && number >= -100 && number <= 100) turnOffset = number;             // Steering offset
+	else if (firstChar == 'O' && number >= 0 && number <= 250) motorDeadzone = int(number);        // Motor deadzone offset
 
 
 	// Animations
@@ -284,60 +304,56 @@ void evaluateSerial() {
 
 	// Manual servo control
 	// -- -- -- -- -- -- -- -- -- -- -- -- -- --
-	else if (firstChar == 'L' && number >= 0 && number <= 100) {   // Move left arm
+	else if (firstChar == 'L' && number >= 0 && number <= 100) {  // Move left arm
 		autoMode = false;
 		queue.clear();
 		setpos[5] = int(number * 0.01 * (preset[5][1] - preset[5][0]) + preset[5][0]);
-	} else if (firstChar == 'R' && number >= 0 && number <= 100) { // Move right arm
+	} else if (firstChar == 'R' && number >= 0 && number <= 100) {  // Move right arm
 		autoMode = false;
 		queue.clear();
 		setpos[6] = int(number * 0.01 * (preset[6][1] - preset[6][0]) + preset[6][0]);
-	} else if (firstChar == 'B' && number >= 0 && number <= 100) { // Move neck bottom
+	} else if (firstChar == 'B' && number >= 0 && number <= 100) {  // Move neck bottom
 		autoMode = false;
 		queue.clear();
 		setpos[2] = int(number * 0.01 * (preset[2][1] - preset[2][0]) + preset[2][0]);
-	} else if (firstChar == 'T' && number >= 0 && number <= 100) { // Move neck top
+	} else if (firstChar == 'T' && number >= 0 && number <= 100) {  // Move neck top
 		autoMode = false;
 		queue.clear();
 		setpos[1] = int(number * 0.01 * (preset[1][1] - preset[1][0]) + preset[1][0]);
-	} else if (firstChar == 'G' && number >= 0 && number <= 100) { // Move head rotation
+	} else if (firstChar == 'G' && number >= 0 && number <= 100) {  // Move head rotation
 		autoMode = false;
 		queue.clear();
 		setpos[0] = int(number * 0.01 * (preset[0][1] - preset[0][0]) + preset[0][0]);
-	} else if (firstChar == 'E' && number >= 0 && number <= 100) { // Move eye left
+	} else if (firstChar == 'E' && number >= 0 && number <= 100) {  // Move eye left
 		autoMode = false;
 		queue.clear();
 		setpos[4] = int(number * 0.01 * (preset[4][1] - preset[4][0]) + preset[4][0]);
-	} else if (firstChar == 'U' && number >= 0 && number <= 100) { // Move eye right
+	} else if (firstChar == 'U' && number >= 0 && number <= 100) {  // Move eye right
 		autoMode = false;
 		queue.clear();
 		setpos[3] = int(number * 0.01 * (preset[3][1] - preset[3][0]) + preset[3][0]);
 	}
-	
+
 
 	// Manual Movements with WASD
 	// -- -- -- -- -- -- -- -- -- -- -- -- -- --
-	else if (firstChar == 'w') {		// Forward movement
+	else if (firstChar == 'w') {  // Forward movement
 		moveValue = pwmspeed;
 		turnValue = 0;
 		setpos[0] = (preset[0][1] + preset[0][0]) / 2;
-	}
-	else if (firstChar == 'q') {		// Stop movement
+	} else if (firstChar == 'q') {  // Stop movement
 		moveValue = 0;
 		turnValue = 0;
 		setpos[0] = (preset[0][1] + preset[0][0]) / 2;
-	}
-	else if (firstChar == 's') {		// Backward movement
+	} else if (firstChar == 's') {  // Backward movement
 		moveValue = -pwmspeed;
 		turnValue = 0;
 		setpos[0] = (preset[0][1] + preset[0][0]) / 2;
-	}
-	else if (firstChar == 'a') {		// Drive & look left
+	} else if (firstChar == 'a') {  // Drive & look left
 		moveValue = 0;
 		turnValue = -pwmspeed;
 		setpos[0] = preset[0][0];
-	}
-	else if (firstChar == 'd') {   		// Drive & look right
+	} else if (firstChar == 'd') {  // Drive & look right
 		moveValue = 0;
 		turnValue = pwmspeed;
 		setpos[0] = preset[0][1];
@@ -346,19 +362,16 @@ void evaluateSerial() {
 
 	// Manual Eye Movements
 	// -- -- -- -- -- -- -- -- -- -- -- -- -- --
-	else if (firstChar == 'j') {		// Left head tilt
+	else if (firstChar == 'j') {  // Left head tilt
 		setpos[4] = preset[4][0];
 		setpos[3] = preset[3][1];
-	}
-	else if (firstChar == 'l') {		// Right head tilt
+	} else if (firstChar == 'l') {  // Right head tilt
 		setpos[4] = preset[4][1];
 		setpos[3] = preset[3][0];
-	}
-	else if (firstChar == 'i') {		// Sad head
+	} else if (firstChar == 'i') {  // Sad head
 		setpos[4] = preset[4][0];
 		setpos[3] = preset[3][0];
-	}
-	else if (firstChar == 'k') {		// Neutral head
+	} else if (firstChar == 'k') {  // Neutral head
 		setpos[4] = int(0.4 * (preset[4][1] - preset[4][0]) + preset[4][0]);
 		setpos[3] = int(0.4 * (preset[3][1] - preset[3][0]) + preset[3][0]);
 	}
@@ -366,31 +379,27 @@ void evaluateSerial() {
 
 	// Head movement
 	// -- -- -- -- -- -- -- -- -- -- -- -- -- --
-	else if (firstChar == 'f') {		// Head up
+	else if (firstChar == 'f') {  // Head up
 		setpos[1] = preset[1][0];
-		setpos[2] = (preset[2][1] + preset[2][0])/2;
-	}
-	else if (firstChar == 'g') {		// Head forward
+		setpos[2] = (preset[2][1] + preset[2][0]) / 2;
+	} else if (firstChar == 'g') {  // Head forward
 		setpos[1] = preset[1][1];
 		setpos[2] = preset[2][0];
-	}
-	else if (firstChar == 'h') {		// Head down
+	} else if (firstChar == 'h') {  // Head down
 		setpos[1] = preset[1][0];
 		setpos[2] = preset[2][0];
 	}
-	
+
 
 	// Arm Movements
 	// -- -- -- -- -- -- -- -- -- -- -- -- -- --
-	else if (firstChar == 'b') {		// Left arm low, right arm high
+	else if (firstChar == 'b') {  // Left arm low, right arm high
 		setpos[5] = preset[5][0];
 		setpos[6] = preset[6][1];
-	}
-	else if (firstChar == 'n') {		// Both arms neutral
+	} else if (firstChar == 'n') {  // Both arms neutral
 		setpos[5] = (preset[5][0] + preset[5][1]) / 2;
 		setpos[6] = (preset[6][0] + preset[6][1]) / 2;
-	}
-	else if (firstChar == 'm') {		// Left arm high, right arm low
+	} else if (firstChar == 'm') {  // Left arm high, right arm low
 		setpos[5] = preset[5][1];
 		setpos[6] = preset[6][0];
 	}
@@ -418,8 +427,8 @@ void manageAnimations() {
 		}
 
 
-	// If we are in autonomous mode and no movements are queued, generate random movements
-	// -- -- -- -- -- -- -- -- -- -- -- -- -- --
+		// If we are in autonomous mode and no movements are queued, generate random movements
+		// -- -- -- -- -- -- -- -- -- -- -- -- -- --
 	} else if (autoMode && queue.empty() && (animeTimer <= millis())) {
 
 		// For each of the servos
@@ -438,36 +447,34 @@ void manageAnimations() {
 						min = max;
 						max = preset[i][0];
 					}
-					
-					setpos[i] = random(min, max+1);
 
-				// Since the eyes should work together, only look at one of them
+					setpos[i] = random(min, max + 1);
+
+					// Since the eyes should work together, only look at one of them
 				} else if (i == 3) {
 
-					int midPos1 = int((preset[i][1] - preset[i][0])*0.4 + preset[i][0]);
-					int midPos2 = int((preset[i+1][1] - preset[i+1][0])*0.4 + preset[i+1][0]);
+					int midPos1 = int((preset[i][1] - preset[i][0]) * 0.4 + preset[i][0]);
+					int midPos2 = int((preset[i + 1][1] - preset[i + 1][0]) * 0.4 + preset[i + 1][0]);
 
 					// Determine which type of eye movement to do
 					// Both eye move downwards
 					if (random(2) == 1) {
 						setpos[i] = random(midPos1, preset[i][0]);
 						float multiplier = (setpos[i] - midPos1) / float(preset[i][0] - midPos1);
-						setpos[i+1] = ((1 - multiplier) * (midPos2 - preset[i+1][0])) + preset[i+1][0];
+						setpos[i + 1] = ((1 - multiplier) * (midPos2 - preset[i + 1][0])) + preset[i + 1][0];
 
-					// Both eyes move in opposite directions
+						// Both eyes move in opposite directions
 					} else {
 						setpos[i] = random(midPos1, preset[i][0]);
 						float multiplier = (setpos[i] - preset[i][1]) / float(preset[i][0] - preset[i][1]);
-						setpos[i+1] = (multiplier * (preset[i+1][1] - preset[i+1][0])) + preset[i+1][0];
+						setpos[i + 1] = (multiplier * (preset[i + 1][1] - preset[i + 1][0])) + preset[i + 1][0];
 					}
 				}
-
 			}
 		}
 
 		// Finally, figure out the amount of time until the next movement should be done
 		animeTimer = millis() + random(500, 3000);
-
 	}
 }
 
@@ -515,7 +522,7 @@ void manageServos(float dt) {
 			// Limit Velocity
 			if (curvel[i] > maxvel[i]) curvel[i] = maxvel[i];
 			if (curvel[i] < -maxvel[i]) curvel[i] = -maxvel[i];
-			
+
 			float dP = curvel[i] * dt / 1000.0;
 
 			if (abs(dP) < abs(posError)) curpos[i] += dP;
@@ -543,7 +550,7 @@ void manageServos(float dt) {
 
 // -------------------------------------------------------------------
 /// Servo "Soft Start" function
-/// 
+///
 /// This function tries to start the servos up servo gently,
 /// reducing the sudden jerking motion which usually occurs
 /// when the motors power up for the first time.
@@ -600,7 +607,7 @@ void manageMotors(float dt) {
 			// Determine whether to accelerate or decelerate
 			float acceleration = accell[i];
 			if (setpos[i] < curvel[i] && curvel[i] >= 0) acceleration = -accell[i];
-			else if (setpos[i] < curvel[i] && curvel[i] < 0) acceleration = -accell[i]; 
+			else if (setpos[i] < curvel[i] && curvel[i] < 0) acceleration = -accell[i];
 			else if (setpos[i] > curvel[i] && curvel[i] < 0) acceleration = accell[i];
 
 			// Update the current velocity
@@ -613,7 +620,7 @@ void manageMotors(float dt) {
 
 		// Apply deadzone offset
 		if (curvel[i] > 0) curvel[i] += motorDeadzone;
-		else if (curvel[i] < 0) curvel[i] -= motorDeadzone; 
+		else if (curvel[i] < 0) curvel[i] -= motorDeadzone;
 
 		// Limit Velocity
 		if (curvel[i] > maxvel[i]) curvel[i] = maxvel[i];
@@ -622,7 +629,7 @@ void manageMotors(float dt) {
 
 	// Update motor speeds
 	motorL.setSpeed(curvel[NUMBER_OF_SERVOS]);
-	motorR.setSpeed(curvel[NUMBER_OF_SERVOS+1]);
+	motorR.setSpeed(curvel[NUMBER_OF_SERVOS + 1]);
 }
 
 
@@ -639,13 +646,17 @@ void checkBatteryLevel() {
 	voltage = voltage / DIVIDER_SCALING_FACTOR;
 	int percentage = int(100 * (voltage - BATTERY_MIN_VOLTAGE) / float(BATTERY_MAX_VOLTAGE - BATTERY_MIN_VOLTAGE));
 
-  // Update the oLed Display if installed
-  #ifdef OLED
-    displayLevel(percentage);
-  #endif
+// Update the oLed Display if installed
+#ifdef OLED
+	displayLevel(percentage);
+#endif
 
 	// Send the percentage via serial
-	Serial.print(F("Battery_")); Serial.println(percentage);
+	 Serial.print(F("Battery_"));
+	 Serial.println(percentage);
+	// Send the voltage via serial
+	// Serial.print(F("Voltage_"));
+	// Serial.println(voltage);
 }
 #endif
 
@@ -659,7 +670,7 @@ void loop() {
 
 	// Read any new serial messages
 	// -- -- -- -- -- -- -- -- -- -- -- -- -- --
-	if (Serial.available() > 0){
+	if (Serial.available() > 0) {
 		readSerial();
 	}
 
@@ -688,8 +699,13 @@ void loop() {
 	if (millis() - statusTimer >= STATUS_CHECK_TIME) {
 		statusTimer = millis();
 
-		#ifdef BAT_L
-			checkBatteryLevel();
-		#endif
+#ifdef BAT_L
+		checkBatteryLevel();
+#endif
 	}
+	//sound button
+	buttonSound();
+
+	//controller section
+	receiverloop();
 }
